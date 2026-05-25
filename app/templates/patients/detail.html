@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %} - {{ patient.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-4 gap-3">
+  <a href="{{ url_for('patients.list_patients') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+  <h4 class="fw-bold mb-0">{{ patient.name }}</h4>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-4">
+        <div class="avatar-lg bg-primary-soft text-primary mx-auto mb-3">
+          <i class="bi bi-person-fill fs-2"></i>
+        </div>
+        <h5 class="fw-bold">{{ patient.name }}</h5>
+        <p class="text-muted small mb-0">Paciente #{{ patient.id }}</p>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between">
+          <span class="text-muted"><i class="bi bi-card-text me-2"></i>CPF</span>
+          <span class="font-monospace">{{ patient.cpf }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span class="text-muted"><i class="bi bi-phone me-2"></i>Telefone</span>
+          <span>{{ patient.phone or '—' }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span class="text-muted"><i class="bi bi-cake me-2"></i>Nascimento</span>
+          <span>{{ patient.birth_date.strftime('%d/%m/%Y') if patient.birth_date else '—' }}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-calendar-check me-2 text-primary"></i>Sessões ({{ sessions|length }})</h6>
+        <a href="{{ url_for('sessions.new_session') }}" class="btn btn-sm btn-primary">
+          <i class="bi bi-plus me-1"></i>Nova Sessão
+        </a>
+      </div>
+      <div class="card-body p-0">
+        {% if sessions %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr><th>Data</th><th>Observações</th><th class="text-end">Ações</th></tr>
+            </thead>
+            <tbody>
+              {% for s in sessions %}
+              <tr>
+                <td><span class="badge bg-primary-soft text-primary">{{ s.date.strftime('%d/%m/%Y') }}</span></td>
+                <td class="text-muted small">{{ s.notes[:100] ~ '...' if s.notes and s.notes|length > 100 else (s.notes or '—') }}</td>
+                <td class="text-end">
+                  <form action="{{ url_for('sessions.delete', session_id=s.id) }}" method="POST" class="d-inline"
+                        onsubmit="return confirm('Remover esta sessão?')">
+                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-muted">
+          <i class="bi bi-calendar-x fs-1 mb-2 d-block"></i>Nenhuma sessão registrada.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

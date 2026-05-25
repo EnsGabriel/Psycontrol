@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %} - {% if session %}Editar{% else %}Nova{% endif %} Sessão{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="d-flex align-items-center mb-4 gap-3">
+      <a href="{{ url_for('sessions.list_sessions') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+      <h4 class="fw-bold mb-0">
+        <i class="bi bi-calendar-{% if session %}check{% else %}plus{% endif %} me-2 text-primary"></i>
+        {% if session %}Editar Sessão{% else %}Nova Sessão{% endif %}
+      </h4>
+    </div>
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <form method="POST">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Paciente <span class="text-danger">*</span></label>
+            <select name="patient_id" class="form-select" required>
+              <option value="">Selecione um paciente...</option>
+              {% for p in patients %}
+              <option value="{{ p.id }}" {% if session and session.patient_id == p.id %}selected{% endif %}>{{ p.name }}</option>
+              {% endfor %}
+            </select>
+            {% if not patients %}
+            <div class="form-text text-danger">
+              Nenhum paciente cadastrado. <a href="{{ url_for('patients.new_patient') }}">Cadastre primeiro.</a>
+            </div>
+            {% endif %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Data <span class="text-danger">*</span></label>
+            <input type="date" name="date" class="form-control" required
+                   value="{{ session.date.strftime('%Y-%m-%d') if session else '' }}"/>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Observações</label>
+            <textarea name="notes" class="form-control" rows="5"
+                      placeholder="Anotações da sessão...">{{ session.notes if session else '' }}</textarea>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="bi bi-check-lg me-1"></i>{% if session %}Atualizar{% else %}Salvar{% endif %}
+            </button>
+            <a href="{{ url_for('sessions.list_sessions') }}" class="btn btn-outline-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
